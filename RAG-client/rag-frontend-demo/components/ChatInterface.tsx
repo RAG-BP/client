@@ -1,12 +1,11 @@
 "use client";
 import React, { useState } from 'react';
 
-// Definisanje tipova za podatke koje dobijamo od API-ja (ako koristite TypeScript)
 interface Source {
     title: string;
     url: string;
     category: string;
-    score: string; // Score je string jer ga Python šalje kao formatirani string
+    score: string;
 }
 
 interface RagResponse {
@@ -20,17 +19,15 @@ const ChatInterface: React.FC = () => {
     const [ragResponse, setRagResponse] = useState<RagResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Dohvatanje API URL-a iz varijabli okruženja
-    // `process.env.NEXT_PUBLIC_API_URL` će biti `http://localhost:5000/query`
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/query';
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Sprečava podrazumevano ponašanje forme (reload stranice)
-        if (!query.trim()) return; // Ne šalji prazan upit
+        e.preventDefault();
+        if (!query.trim()) return;
 
         setLoading(true);
-        setRagResponse(null); // Resetuj prethodni odgovor
-        setError(null); // Resetuj grešku
+        setRagResponse(null);
+        setError(null);
 
         try {
             const response = await fetch(API_URL, {
@@ -38,22 +35,22 @@ const ChatInterface: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query }), // Šalje pitanje kao JSON
+                body: JSON.stringify({ query }),
             });
 
-            if (!response.ok) { // Provera da li je odgovor HTTP 200 OK
+            if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Greška prilikom komunikacije sa API-jem.');
             }
 
-            const data: RagResponse = await response.json(); // Parsiranje JSON odgovora
+            const data: RagResponse = await response.json();
             setRagResponse(data);
         } catch (err: any) {
             setError(err.message || 'Došlo je do nepoznate greške.');
-            console.error("Fetch error:", err); // Logovanje greške za debagovanje
+            console.error("Fetch error:", err);
         } finally {
             setLoading(false);
-            setQuery(''); // Očisti input polje
+            setQuery('');
         }
     };
 
@@ -102,12 +99,12 @@ const ChatInterface: React.FC = () => {
                                         <p className="font-medium text-blue-800">{source.title}</p>
                                         <p className="text-sm text-gray-600">Kategorija: <span className="font-semibold">{source.category}</span></p>
                                         <p className="text-sm text-gray-600">Relevantnost: <span className="font-semibold">{source.score}</span></p>
-                                        {source.url !== 'N/A' && ( // Prikaži URL samo ako nije 'N/A'
+                                        {source.url !== 'N/A' && (
                                             <a
                                                 href={source.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-blue-600 hover:underline text-sm break-all" // break-all za duge URL-ove
+                                                className="text-blue-600 hover:underline text-sm break-all"
                                             >
                                                 {source.url}
                                             </a>
